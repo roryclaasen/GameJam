@@ -1,0 +1,12 @@
+{ "columns":27,
+ "image":"building.tilesheet.png",
+ "imageheight":1280,
+ "imagewidth":1728,
+ "margin":0,
+ "name":"building",
+ "spacing":0,
+ "tilecount":540,
+ "tileheight":64,
+ "tilewidth":64,
+ "type":"tileset"
+}

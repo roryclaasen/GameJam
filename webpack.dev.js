@@ -13,6 +13,10 @@ module.exports = merge(common, {
     devtool: 'inline-source-map',
     devServer: {
         contentBase: './dist',
-        hot: true
+        hot: true,
+        overlay: {
+            warnings: false,
+            errors: true
+        }
     },
 });

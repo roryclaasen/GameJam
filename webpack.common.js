@@ -7,7 +7,7 @@ const { CheckerPlugin } = require('awesome-typescript-loader')
 module.exports = {
     entry: {
         app: './src/index.ts',
-        style: './src/style.css'
+        style: './src/style.scss'
     },
     plugins: [
         new CleanWebpackPlugin(['dist']),
@@ -30,24 +30,26 @@ module.exports = {
         extensions: ['.tsx', '.ts', '.js']
     },
     module: {
-        rules: [
-            {
-                test: /\.ts(x?)$/,
-                loader: 'awesome-typescript-loader',
-                exclude: /node_modules/
-            },
-            {
-                test: /\.css$/,
-                use: [
-                    'style-loader',
-                    'css-loader'
-                ]
-            }, {
-                test: /\.(png|svg|jpg|gif)$/,
-                use: [
-                    'file-loader'
-                ]
-            }
-        ]
+        rules: [{
+            type: 'javascript/auto',
+            test: /\.(json|html)/,
+            exclude: /node_modules/,
+            use: ['file-loader'],
+        },
+        {
+            test: /\.ts(x?)$/,
+            loader: 'awesome-typescript-loader',
+            exclude: /node_modules/
+        }, {
+            test: /\.(png|svg|jpg|gif|tmx)$/,
+            use: ['file-loader']
+        }, {
+            test: /\.scss$/,
+            use: [
+                "style-loader",
+                "css-loader",
+                "sass-loader"
+            ]
+        }]
     }
 };
