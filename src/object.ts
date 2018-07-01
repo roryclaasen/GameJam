@@ -35,6 +35,8 @@ export class GameObject {
         this._bodySprite.position.y = y;
 
         this.angle = 0;
+        this.body.velocity.x = 0;
+        this.body.velocity.y = 0;
     }
 
     get body(): Matter.Body {
@@ -60,15 +62,15 @@ export class GameObject {
     set x(value: number) {
         this._body.position.x = value;
 
-        this._sprite.position.x = this._body.position.x;// * 2;
+        this._sprite.position.x = this._body.position.x;
         this._bodySprite.position.x = this._body.position.x;// * 2;
     }
 
     set y(value: number) {
         this._body.position.y = value;
 
-        this._sprite.position.y = this._body.position.y;// * 2;
-        this._bodySprite.position.y = this._body.position.y;// * 2;
+        this._sprite.position.y = this._body.position.y;
+        this._bodySprite.position.y = this._body.position.y;
     }
 
     get angle(): number {
@@ -83,11 +85,11 @@ export class GameObject {
     }
 
     radians = function (degrees: number) {
-          return (degrees * Math.PI) / 180;
+        return (degrees * Math.PI) / 180;
     };
 
     degrees = function (radians: number) {
-          return (radians * 180) / Math.PI;
+        return (radians * 180) / Math.PI;
     };
 
     moveForward(value: number) {
@@ -104,13 +106,22 @@ export class GameObject {
         if (this._sprite) this._sprite.destroy();
     }
 
-    gameLoop(delta: number): void {}
+    gameLoop(delta: number): void { }
+}
+
+export class PhysicsWall extends GameObject {
+    constructor(x: number, y: number, w: number, h: number) {
+        super(x, y, w, h);
+        this._body.isStatic = true;
+    }
 }
 
 export class Entity extends GameObject {
-    protected movingSpeed: number =  1;
+    protected movingSpeed: number = 1;
     protected turningSpeed: number = 0.3;
 
+    protected moving: any;
+    protected onMovedOveride = false;
     constructor(sprite?: PIXI.Sprite) {
         super(0, 0, 0, 0, (sprite === undefined) ? new Sprite() : sprite);
     }
@@ -127,23 +138,74 @@ export class Entity extends GameObject {
         return this.sprite;
     }
 
-    get position(): PIXI.Point | PIXI.ObservablePoint{
+    get position(): PIXI.Point | PIXI.ObservablePoint {
         return this.sprite.position;
+    }
+
+    set onMove(func: any) {
+        this.moving = func;
+    }
+
+    moveForward(value: number) {
+        super.moveForward(value);
+        if (this.moving != undefined && !this.onMovedOveride) this.moving(this.x, this.y);
+    }
+
+    moveBackward(value: number) {
+        super.moveBackward(value);
+        if (this.moving != undefined && !this.onMovedOveride) this.moving(this.x, this.y);
     }
 }
 
 export class Player extends Entity {
-    constructor() {
+    private gameWidth: number;
+    private gameHeight: number;
+
+    private maxSacleSpeed = 2;
+    private _scaleSpeed = 0;
+
+    constructor(width: number, height: number) {
         super(AssetManager.newSprite('player'));
-        this._body.isStatic = true;
-        this.movingSpeed = 1.2;
+
+        this.gameWidth = width;
+        this.gameHeight = height;
+
+        this._body.label = "Player";
+        // consts.Body.setMass(this._body, 0);
+        consts.Body.setStatic(this._body, true);;
+        this.movingSpeed = 2.5;
         this.turningSpeed = 0.1;
+        this.onMovedOveride = true;
     }
 
-    gameLoop(delta: number) { 
+    gameLoop(delta: number) {
+        var moved = false;
         if (Keyboard.isDown(Keyboard.A)) this.angle -= this.turningSpeed * delta;
         if (Keyboard.isDown(Keyboard.D)) this.angle += this.turningSpeed * delta;
-        if (Keyboard.isDown(Keyboard.W)) this.moveForward(this.movingSpeed * delta);
-        if (Keyboard.isDown(Keyboard.S)) this.moveBackward(this.movingSpeed * delta);
+        if (Keyboard.isDown(Keyboard.W)) {
+            this.moveForward(this.movingSpeed * delta);
+            this._scaleSpeed += 0.01;
+            moved = true;
+        }
+        if (Keyboard.isDown(Keyboard.S)) {
+            this.moveBackward(this.movingSpeed * delta);
+            this._scaleSpeed += 0.01;
+            moved = true;
+        }
+        if (this._scaleSpeed > this.maxSacleSpeed) this._scaleSpeed = this.maxSacleSpeed;
+        if (!Keyboard.isDown(Keyboard.S) && !Keyboard.isDown(Keyboard.W)) this._scaleSpeed = 0;
+
+        if (this.x < 0)  this.x = this.gameWidth - 1;
+        if (this.x > this.gameWidth)  this.x = 1;
+        if (this.y < 0)  this.y = this.gameHeight - 1;
+        if (this.y > this.gameHeight) this.y = 1;
+
+        if (moved) {
+            this.moving(this.x, this.y);
+        }
+    }
+
+    get scaleSpeed(): number {
+        return this._scaleSpeed;
     }
 }

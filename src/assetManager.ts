@@ -3,6 +3,7 @@ import * as PIXI from 'pixi.js';
 import tilesheetBuilding from './resources/building.tilesheet.png';
 import tilesheetBuildingData from './resources/building.tilesheet.json';
 import cellblock from './resources/map/cellblock.json';
+import level2 from './resources/map/level2.json';
 
 import oldMan from './resources/manOld_stand.png';
 
@@ -14,7 +15,8 @@ export class AssetManager {
     static loadAll(): void {
         this.loader.add('sheetBuilding', tilesheetBuilding);
         this.loader.add('sheetBuildingData', tilesheetBuildingData);
-        this.loader.add('levelCellblock', cellblock);
+        this.loader.add('level0', cellblock);
+        this.loader.add('level1', level2);
         this.loader.add('player', oldMan);
 
         this.loader.on("complete", AssetManager.completed);
