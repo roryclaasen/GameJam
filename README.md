@@ -10,7 +10,9 @@ There is no end game state (just a crash)
 
 ## Next steps
 
-I want to (start from scratch and) continue the development cobining some of the themes and ideas from the other games submited for this jam
+I want to (start from scratch and) continue the development combining some of the themes and ideas from the other games submited for this jam.
+
+Project [here](https://github.com/roryclaasen/PrisionEscape/)
 
 ## License
 
